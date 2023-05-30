@@ -1,0 +1,88 @@
+SELECT *
+FROM cellphones_data
+
+UPDATE cellphones_data
+SET cellphone_id = cast (cellphone_id as int)
+-- update не конвертирует данные, поэтому для удобства, данные будут конвертироваться в запросе. 
+
+-- какие бренды выбирают чаще всего
+SELECT brand, COUNT (brand) as number_entries
+FROM cellphones_data
+GROUP BY brand
+ORDER BY 2 DESC
+ 
+-- топ 5 самых дорогих и дешевых устройств
+SELECT TOP 5 brand, model, convert (int, price) as price
+FROM cellphones_data
+ORDER BY price DESC
+
+SELECT TOP 5 brand, model, convert (int, price) as price
+FROM cellphones_data
+ORDER BY price ASC
+
+-- средняя цена товара 
+SELECT brand, AVG( convert (int, price)) as avg_price, COUNT (brand) number_entries
+FROM cellphones_data
+GROUP BY brand
+ORDER BY avg_price DESC
+
+-- максимальные показатели устройства каждого бренда по каждой категории. 
+Select brand, MAX( convert (int, [internal memory])) OVER (Partition by brand ORDER by [internal memory]) as max_internal_memory, 
+MAX (convert (int, RAM)) OVER (Partition by brand ORDER by RAM) as max_RAM, 
+MAX (convert (float, performance)) OVER (Partition by brand ORDER by performance) max_performance, 
+MAX (convert (int, [main camera])) OVER (Partition by brand ORDER by [main camera]) max_main_camera, 
+MAX (convert (int, [selfie camera])) OVER (Partition by brand ORDER by [selfie camera]) max_selfie_camera, 
+MAX (convert(int, [battery size])) OVER (Partition by brand ORDER by [battery size]) max_battery_size , 
+MAX (convert (float, [screen size])) OVER (Partition by brand ORDER by [screen size]) max_screen_size, 
+MAX (convert (int, weight)) OVER (Partition by brand ORDER by weight) max_weight, price
+From cellphones_data
+--WHERE brand = 'Apple' or brand = 'Samsung' 
+
+-- максимальные показатели устройства у каждого бренда
+SELECT brand, MAX( convert (int, [internal memory])) [internal memory], MAX (convert (int, RAM)) RAM, 
+MAX (convert (float, performance)) performance, MAX (convert (int, [main camera])) [main camera], 
+MAX (convert (int, [selfie camera])) [selfie camera], MAX (convert(int, [battery size])) [battery size], 
+MAX (convert (float, [screen size])) [screen size], MAX (convert (int, weight)) weight, MAX (cast ( price as int)) price
+From cellphones_data
+GROUP BY brand
+--WHERE brand = 'Apple' or brand = 'Samsung' 
+
+-- объединяем с таблицей рейтинга, чтобы выяснить доп. информацию
+SELECT *
+FROM cellphones_ratings
+JOIN cellphones_data
+	ON cellphones_ratings.cellphone_id = cellphones_data.cellphone_id
+ORDER BY 2 ASC
+
+-- количество оценок бренда и средняя оценка
+SELECT brand, AVG (cast (rating as int)) max_rating, COUNT (brand) brand_popular
+FROM cellphones_ratings as ratings
+JOIN cellphones_data as data
+	ON ratings.cellphone_id = data.cellphone_id
+GROUP BY brand
+ORDER BY 2 DESC
+
+-- самое лучшее устройство по рейтингу
+SELECT model, rating
+FROM cellphones_ratings as ratings
+JOIN cellphones_data as data
+	ON ratings.cellphone_id = data.cellphone_id
+WHERE rating = (SELECT MAX (cast (rating as int)) FROM cellphones_ratings)
+ORDER BY 2 DESC
+
+SELECT model, rating
+FROM cellphones_ratings as ratings
+JOIN cellphones_data as data
+	ON ratings.cellphone_id = data.cellphone_id
+WHERE model = (SELECT MAX (cast (rating as int)) FROM cellphones_ratings)
+ORDER BY 2 DESC
+
+SELECT model, MAX ((COUNT (model))) brand_popular
+FROM cellphones_ratings as ratings
+JOIN cellphones_data as data
+	ON ratings.cellphone_id = data.cellphone_id
+GROUP BY model
+ORDER BY 2 DESC
+
+SELECT *
+FROM cellphones_users
