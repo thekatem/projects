@@ -3,9 +3,9 @@ FROM cellphones_data
 
 UPDATE cellphones_data
 SET cellphone_id = cast (cellphone_id as int)
--- update не конвертирует данные, поэтому для удобства, данные будут конвертироваться в запросе. 
+-- update Г­ГҐ ГЄГ®Г­ГўГҐГ°ГІГЁГ°ГіГҐГІ Г¤Г Г­Г­Г»ГҐ, ГЇГ®ГЅГІГ®Г¬Гі Г¤Г«Гї ГіГ¤Г®ГЎГ±ГІГўГ , Г¤Г Г­Г­Г»ГҐ ГЎГіГ¤ГіГІ ГЄГ®Г­ГўГҐГ°ГІГЁГ°Г®ГўГ ГІГјГ±Гї Гў Г§Г ГЇГ°Г®Г±ГҐ. 
  
--- топ 5 самых дорогих и дешевых устройств и средний рейтинг устройства
+-- ГІГ®ГЇ 5 Г±Г Г¬Г»Гµ Г¤Г®Г°Г®ГЈГЁГµ ГЁ Г¤ГҐГёГҐГўГ»Гµ ГіГ±ГІГ°Г®Г©Г±ГІГў ГЁ Г±Г°ГҐГ¤Г­ГЁГ© Г°ГҐГ©ГІГЁГ­ГЈ ГіГ±ГІГ°Г®Г©Г±ГІГўГ 
 SELECT TOP 5 brand, model, convert (int, price) as price, AVG (cast (rating as int)) rating
 FROM cellphones_data data
 JOIN cellphones_ratings ratings
@@ -21,7 +21,7 @@ GROUP BY brand, model, price
 ORDER BY price ASC
 
 
--- средняя цена товара и количество голосов за устройства
+-- Г±Г°ГҐГ¤Г­ГїГї Г¶ГҐГ­Г  ГІГ®ГўГ Г°Г  ГЁ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® ГЈГ®Г«Г®Г±Г®Гў Г§Г  ГіГ±ГІГ°Г®Г©Г±ГІГўГ 
 SELECT brand, AVG( convert (int, price)) as avg_price, COUNT (*) number_votes
 FROM cellphones_data data
 JOIN cellphones_ratings ratings
@@ -30,7 +30,7 @@ GROUP BY brand
 ORDER BY avg_price DESC
 
 
--- количество голосов за устройства бренда и средняя оценка
+-- ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® ГЈГ®Г«Г®Г±Г®Гў Г§Г  ГіГ±ГІГ°Г®Г©Г±ГІГўГ  ГЎГ°ГҐГ­Г¤Г  ГЁ Г±Г°ГҐГ¤Г­ГїГї Г®Г¶ГҐГ­ГЄГ 
 SELECT brand, AVG (cast (rating as int)) avg_rating, COUNT (*) number_votes
 FROM cellphones_ratings as ratings
 JOIN cellphones_data as data
@@ -38,7 +38,7 @@ JOIN cellphones_data as data
 GROUP BY brand
 ORDER BY 2 DESC
 
--- модель устройства с максимальным рейтингом
+-- Г¬Г®Г¤ГҐГ«Гј ГіГ±ГІГ°Г®Г©Г±ГІГўГ  Г± Г¬Г ГЄГ±ГЁГ¬Г Г«ГјГ­Г»Г¬ Г°ГҐГ©ГІГЁГ­ГЈГ®Г¬
 SELECT brand, model, rating
 FROM cellphones_ratings as ratings
 JOIN cellphones_data as data
@@ -47,7 +47,7 @@ WHERE rating = (SELECT MAX (cast (rating as int)) FROM cellphones_ratings)
 ORDER BY 2 DESC
 
 
--- модель устройства с самым лучшим общим полученным рейтингом
+-- Г¬Г®Г¤ГҐГ«Гј ГіГ±ГІГ°Г®Г©Г±ГІГўГ  Г± Г±Г Г¬Г»Г¬ Г«ГіГ·ГёГЁГ¬ Г®ГЎГ№ГЁГ¬ ГЇГ®Г«ГіГ·ГҐГ­Г­Г»Г¬ Г°ГҐГ©ГІГЁГ­ГЈГ®Г¬
 WITH max_cte as (
 SELECT brand, model, SUM( convert (int, rating)) popular_model
 FROM cellphones_ratings as ratings
@@ -60,7 +60,7 @@ FROM max_cte
 WHERE popular_model = (SELECT MAX (popular_model) FROM max_cte)
 
 
--- общий рейтинг бренда и средняя цена на товары
+-- Г®ГЎГ№ГЁГ© Г°ГҐГ©ГІГЁГ­ГЈ ГЎГ°ГҐГ­Г¤Г  ГЁ Г±Г°ГҐГ¤Г­ГїГї Г¶ГҐГ­Г  Г­Г  ГІГ®ГўГ Г°Г»
 Select brand, SUM( convert (int, rating))  popular_brand,
  AVG ( convert (int,price)) price
 From cellphones_data  as data
@@ -70,7 +70,7 @@ JOIN cellphones_ratings as ratings
 	ORDER BY popular_brand DESC
 
 
--- кол-во устройств у брендов с максимальным рейтингом 
+-- ГЄГ®Г«-ГўГ® ГіГ±ГІГ°Г®Г©Г±ГІГў Гі ГЎГ°ГҐГ­Г¤Г®Гў Г± Г¬Г ГЄГ±ГЁГ¬Г Г«ГјГ­Г»Г¬ Г°ГҐГ©ГІГЁГ­ГЈГ®Г¬ 
 SELECT brand, COUNT (*) as max_count
 From cellphones_data data
 JOIN cellphones_ratings as ratings
@@ -79,7 +79,7 @@ WHERE rating = '10' or rating = '18'
 GROUP BY brand 
 ORDER BY 2 DESC
 
--- кто покупает устройства чаще всего, с разбивкой по полу и бренду
+-- ГЄГІГ® ГЇГ®ГЄГіГЇГ ГҐГІ ГіГ±ГІГ°Г®Г©Г±ГІГўГ  Г·Г Г№ГҐ ГўГ±ГҐГЈГ®, Г± Г°Г Г§ГЎГЁГўГЄГ®Г© ГЇГ® ГЇГ®Г«Гі ГЁ ГЎГ°ГҐГ­Г¤Гі
 SELECT brand, COUNT (model) as gender_count, gender
 From cellphones_data data
 JOIN cellphones_ratings as ratings
@@ -90,7 +90,7 @@ WHERE gender is NOT NULL
 GROUP BY brand, gender
 ORDER BY 1 
 
--- кол-во оцененных устройств каждым полом, включая тех, кто его не указал. и средняя цена и рейтинг по полу. 
+-- ГЄГ®Г«-ГўГ® Г®Г¶ГҐГ­ГҐГ­Г­Г»Гµ ГіГ±ГІГ°Г®Г©Г±ГІГў ГЄГ Г¦Г¤Г»Г¬ ГЇГ®Г«Г®Г¬, ГўГЄГ«ГѕГ·Г Гї ГІГҐГµ, ГЄГІГ® ГҐГЈГ® Г­ГҐ ГіГЄГ Г§Г Г«. ГЁ Г±Г°ГҐГ¤Г­ГїГї Г¶ГҐГ­Г  ГЁ Г°ГҐГ©ГІГЁГ­ГЈ ГЇГ® ГЇГ®Г«Гі. 
 SELECT gender, COUNT (model) as gender_count, AVG (cast (price as int)) avg_price, AVG (cast (rating as int)) avg_rating
 From cellphones_data data
 JOIN cellphones_ratings as ratings
@@ -100,7 +100,7 @@ JOIN cellphones_users users
 GROUP BY gender
 ORDER BY 1 
 
--- средний рейтинг устройств по возрастным группам. 
+-- Г±Г°ГҐГ¤Г­ГЁГ© Г°ГҐГ©ГІГЁГ­ГЈ ГіГ±ГІГ°Г®Г©Г±ГІГў ГЇГ® ГўГ®Г§Г°Г Г±ГІГ­Г»Г¬ ГЈГ°ГіГЇГЇГ Г¬. 
 WITH age_cte as (
 SELECT brand, age, rating,
 CASE 
